@@ -6,6 +6,7 @@ import { isEnabledSource, type EnabledSourceId } from "@/lib/sources";
 import { winbuEmbed, winbuEpisode } from "@/lib/winbu";
 import { detectStreamKind } from "@/lib/stream-kind";
 import { WatchPlayer, type WatchStream } from "@/components/watch-player";
+import { MarkWatched } from "@/components/mark-watched";
 
 interface PageProps { params: Promise<{ source: string; episodeId: string }>; searchParams: Promise<Record<string, string | undefined>> }
 
@@ -29,7 +30,7 @@ async function AnimeKitaWatch({ source, episodeId, query }: { source: string; ep
   const streams: WatchStream[] = Object.entries(data?.streams ?? {}).flatMap(([quality, items]) =>
     items.map((stream, index) => ({ quality, label: `${quality} • Server ${index + 1}`, link: stream.link ?? "", size: stream.size_kb, kind: streamKind(stream.link ?? "") })),
   );
-  return <WatchShell title={`Nonton Episode ${query.episode ?? ""}`} back={query.series ? `/s/${source}/anime/${encodeURIComponent(query.series)}` : "/latest"} streams={streams} />;
+  return <WatchShell title={`Nonton Episode ${query.episode ?? ""}`} back={query.series ? `/s/${source}/anime/${encodeURIComponent(query.series)}` : "/latest"} streams={streams} source={source} episodeId={episodeId} series={query.series} episode={query.episode} />;
 }
 
 function extractBellUrl(value: unknown): string {
@@ -54,7 +55,7 @@ async function BellWatch({ source, episodeId, query }: { source: EnabledSourceId
     ...(data?.defaultStreamingUrl ? [{ quality: "Auto", label: "Auto • Default", link: data.defaultStreamingUrl, kind: streamKind(data.defaultStreamingUrl) }] : []),
     ...resolved.flatMap((item) => item.status === "fulfilled" ? [item.value] : []),
   ];
-  return <WatchShell title={data?.title ?? "Nonton episode"} back={query.series ? `/s/${source}/anime/${encodeURIComponent(query.series)}` : "/latest"} streams={streams} />;
+  return <WatchShell title={data?.title ?? "Nonton episode"} back={query.series ? `/s/${source}/anime/${encodeURIComponent(query.series)}` : "/latest"} streams={streams} source={source} episodeId={episodeId} series={query.series} title2={data?.title} />;
 }
 
 async function WinbuWatch({ episodeId, query }: { episodeId: string; query: Record<string, string | undefined> }) {
@@ -69,14 +70,15 @@ async function WinbuWatch({ episodeId, query }: { episodeId: string; query: Reco
     quality: group.resolution,
     label: `${group.resolution} • Mirror ${index + 1}`,
     link: link.url,
-    kind: streamKind(link.url),
+    kind: "download" as const,
   })));
-  const streams = [...resolved.flatMap((item) => item.status === "fulfilled" ? [item.value] : []), ...downloads];
-  return <WatchShell title={data?.title ?? "Nonton episode"} back={query.series ? `/s/winbu/anime/${encodeURIComponent(query.series)}` : "/latest"} streams={streams} />;
+  const streams = resolved.flatMap((item) => item.status === "fulfilled" ? [item.value] : []);
+  return <WatchShell title={data?.title ?? "Nonton episode"} back={query.series ? `/s/winbu/anime/${encodeURIComponent(query.series)}` : "/latest"} streams={streams} downloads={downloads} source="winbu" episodeId={episodeId} series={query.series} title2={data?.title} />;
 }
 
-function WatchShell({ title, back, streams }: { title: string; back: string; streams: WatchStream[] }) {
+function WatchShell({ title, back, streams, downloads = [], source, episodeId, series, episode, title2 }: { title: string; back: string; streams: WatchStream[]; downloads?: WatchStream[]; source: string; episodeId: string; series?: string; episode?: string; title2?: string }) {
   return <main className="min-h-screen pb-[calc(7rem+env(safe-area-inset-bottom))] pt-28 lg:pb-16">
+    <MarkWatched source={source} episodeId={decodeURIComponent(episodeId)} series={series} title={title2 ?? title} episode={episode} />
     <section className="mx-auto max-w-7xl px-4 sm:px-5">
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
         <div>
@@ -85,7 +87,7 @@ function WatchShell({ title, back, streams }: { title: string; back: string; str
           <p className="mt-2 text-sm text-white/55">Pilih server ringan. Kalau error, player otomatis coba alternatif.</p>
         </div>
       </div>
-      <WatchPlayer streams={streams} />
+      <WatchPlayer streams={streams} downloads={downloads} />
     </section>
   </main>;
 }

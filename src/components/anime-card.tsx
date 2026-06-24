@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { Clock3, Play, PlayCircle, Star } from "lucide-react";
 import { PosterImage } from "@/components/poster-image";
+import { BookmarkButton } from "@/components/bookmark-button";
+import { WatchedBadge } from "@/components/watched-badge";
 import { hideSourceText } from "@/lib/sources";
 
 export interface DisplayCard {
@@ -20,6 +22,7 @@ export interface DisplayCard {
   genres?: string[];
   playable?: boolean;
   source?: string;
+  savedAt?: number;
 }
 
 function uniqueBadges(values: Array<string | number | undefined>) {
@@ -69,10 +72,12 @@ export function AnimeCardView({ card }: { card: DisplayCard }) {
       <div className="absolute inset-0 grid place-items-center bg-sky-500/0 opacity-0 transition duration-300 group-hover:bg-sky-500/12 group-hover:opacity-100"><PlayCircle className="size-12 text-white drop-shadow-2xl sm:size-14" /></div>
       {card.score ? <span className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full border border-white/10 bg-black/60 px-2 py-1 text-[10px] font-bold text-sky-100 backdrop-blur sm:left-3 sm:top-3 sm:text-xs"><Star className="size-3 fill-sky-300 text-sky-300" />{card.score}</span> : null}
       {topBadge ? <span className="absolute right-2 top-2 max-w-[58%] truncate rounded-full bg-sky-500/90 px-2 py-1 text-[10px] font-bold text-white shadow-lg shadow-sky-500/30 sm:right-3 sm:top-3 sm:text-xs">{topBadge}</span> : null}
-      {subBadges.length ? <div className="absolute bottom-2 right-2 flex max-w-[72%] flex-wrap justify-end gap-1 sm:bottom-3 sm:right-3">
+      {subBadges.length ? <div className="absolute bottom-12 right-2 flex max-w-[72%] flex-wrap justify-end gap-1 sm:bottom-14 sm:right-3">
         {subBadges.map((badge) => <span key={badge} className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-black/62 px-2 py-1 text-[9px] font-bold text-white/90 backdrop-blur"><Clock3 className="size-3 text-sky-300" />{badge}</span>)}
       </div> : null}
       <span className="absolute bottom-2 left-2 inline-flex translate-y-4 items-center gap-1 rounded-full bg-white px-2.5 py-1.5 text-[10px] font-black text-slate-950 opacity-0 shadow-xl transition duration-300 group-hover:translate-y-0 group-hover:opacity-100 sm:bottom-3 sm:left-3 sm:text-xs"><Play className="size-3 fill-slate-950" />{cta}</span>
+      <BookmarkButton card={card} />
+      <WatchedBadge source={card.source} episodeId={card.episodeId} />
     </div>
     <div className="space-y-1 p-2.5 sm:p-3">
       <h3 className="line-clamp-2 text-xs font-bold leading-snug text-white transition group-hover:text-sky-300 sm:text-sm">{card.title}</h3>

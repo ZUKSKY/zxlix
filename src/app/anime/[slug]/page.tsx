@@ -3,6 +3,8 @@ import { Play, Star } from "lucide-react";
 import { akDetail } from "@/lib/animekita";
 import { cleanSlug, genreSlug } from "@/lib/images";
 import { PosterImage } from "@/components/poster-image";
+import { BookmarkDetailButton } from "@/components/bookmark-detail-button";
+import { EpisodeList, type EpisodeItem } from "@/components/episode-list";
 
 interface PageProps { params: Promise<{ slug: string }> }
 
@@ -24,8 +26,12 @@ export default async function AnimeDetail({ params }: PageProps) {
         <h1 className="text-3xl font-black leading-tight text-white sm:text-4xl md:text-6xl">{data.judul}</h1>
         <p className="mt-4 max-w-3xl whitespace-pre-line leading-7 text-white/65 sm:leading-8">{data.sinopsis}</p>
         {firstEpisode ? <Link href={`/watch/${encodeURIComponent(cleanSlug(firstEpisode.url ?? firstEpisode.id))}?series=${encodeURIComponent(data.series_id ?? slug)}&episode=${encodeURIComponent(String(firstEpisode.ch ?? "1"))}`} className="wuzz-button mt-6 inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-black transition hover:-translate-y-0.5"><Play className="size-4 fill-white" />Tonton episode {firstEpisode.ch}</Link> : null}
+        <BookmarkDetailButton card={{ title: data.judul ?? slug, poster: data.cover, slug, source: "animekita", score: (data.rating ?? data.score) != null ? String(data.rating ?? data.score) : undefined }} />
         <div className="mt-6 flex flex-wrap gap-2">{genres.map((genre) => <Link key={genre} href={`/genres/${genreSlug(genre)}`} className="rounded-full border border-sky-300/20 bg-sky-300/10 px-3 py-1 text-sm text-sky-100 transition hover:bg-sky-300/18">{genre}</Link>)}</div>
-        <div className="mt-8 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">{(data.chapter ?? []).map((ep) => <Link key={ep.url ?? ep.id} href={`/watch/${encodeURIComponent(cleanSlug(ep.url ?? ep.id))}?series=${encodeURIComponent(data.series_id ?? slug)}&episode=${encodeURIComponent(String(ep.ch ?? "1"))}`} className="glass-card rounded-2xl px-4 py-3 transition hover:-translate-y-1 hover:border-sky-300/40"><p className="font-bold text-white">Episode {ep.ch}</p><p className="mt-1 text-xs text-white/45">{ep.date}</p></Link>)}</div>
+        <EpisodeList source="animekita" episodes={(data.chapter ?? []).map((ep): EpisodeItem => {
+          const eid = cleanSlug(ep.url ?? ep.id);
+          return { id: String(ep.url ?? ep.id ?? ep.ch), watchEpisodeId: eid, href: `/watch/${encodeURIComponent(eid)}?series=${encodeURIComponent(data.series_id ?? slug)}&episode=${encodeURIComponent(String(ep.ch ?? "1"))}`, title: `Episode ${ep.ch}`, sub: ep.date ? String(ep.date) : undefined };
+        })} />
       </div>
     </section>
   </main>;

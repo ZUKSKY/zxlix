@@ -1,0 +1,30 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">ZXLIX Anime Lens Icon</title>
+  <desc id="desc">Cyan anime lens Z icon on dark rounded square.</desc>
+  <defs>
+    <radialGradient id="bg" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(142 84) rotate(49) scale(430)">
+      <stop stop-color="#0EA5E9" stop-opacity="0.32"/>
+      <stop offset="0.45" stop-color="#061524"/>
+      <stop offset="1" stop-color="#020617"/>
+    </radialGradient>
+    <linearGradient id="cyan" x1="110" y1="96" x2="405" y2="401" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#E0F7FF"/>
+      <stop offset="0.42" stop-color="#38BDF8"/>
+      <stop offset="1" stop-color="#2563EB"/>
+    </linearGradient>
+    <filter id="glow" x="-60" y="-60" width="632" height="632" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="0" stdDeviation="14" flood-color="#38BDF8" flood-opacity="0.9"/>
+      <feDropShadow dx="0" dy="0" stdDeviation="42" flood-color="#0EA5E9" flood-opacity="0.5"/>
+      <feDropShadow dx="0" dy="24" stdDeviation="38" flood-color="#000000" flood-opacity="0.42"/>
+    </filter>
+  </defs>
+  <rect x="24" y="24" width="464" height="464" rx="112" fill="url(#bg)" stroke="rgba(125,211,252,.26)" stroke-width="4"/>
+  <g filter="url(#glow)">
+    <path d="M82 256C135 174 377 174 430 256C377 338 135 338 82 256Z" fill="rgba(14,165,233,.13)" stroke="url(#cyan)" stroke-width="20" stroke-linejoin="round"/>
+    <circle cx="256" cy="256" r="104" fill="#061524" stroke="#38BDF8" stroke-width="16"/>
+    <path d="M182 201H324L188 311H334" stroke="url(#cyan)" stroke-width="36" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="256" cy="256" r="20" fill="#E0F7FF"/>
+    <path d="M345 169L392 122" stroke="#E0F7FF" stroke-width="14" stroke-linecap="round" opacity="0.92"/>
+    <path d="M127 342L167 302" stroke="#8B5CF6" stroke-width="10" stroke-linecap="round" opacity="0.58"/>
+  </g>
+</svg>

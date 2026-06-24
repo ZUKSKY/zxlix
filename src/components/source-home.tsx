@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { CalendarDays, Play, Search, Sparkles, Star } from "lucide-react";
 import { RailSection } from "@/components/section";
+import { ContinueWatching } from "@/components/continue-watching";
 import { PosterImage } from "@/components/poster-image";
 import { imageProxy } from "@/lib/images";
 import { sourceHome } from "@/lib/unified-catalog";
@@ -51,6 +52,8 @@ export async function SourceHome({ source }: { source: CatalogSourceId }) {
         </div> : null}
       </div>
     </section>
+
+    <ContinueWatching />
 
     <RailSection title="Episode Terbaru" subtitle="Update cepat dari semua server aktif." cards={latestCards} href={joinBase(base, "/latest")} />
     <RailSection title="Sedang Berjalan" subtitle="Series aktif minggu ini." cards={ongoingCards} href={joinBase(base, "/ongoing")} />

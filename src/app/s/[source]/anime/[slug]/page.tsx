@@ -8,6 +8,8 @@ import { isEnabledSource, type EnabledSourceId } from "@/lib/sources";
 import { splitWinbuSlug, winbuDetail, winbuToCard } from "@/lib/winbu";
 import { PosterImage } from "@/components/poster-image";
 import { AnimeCardView } from "@/components/anime-card";
+import { BookmarkDetailButton } from "@/components/bookmark-detail-button";
+import { EpisodeList, type EpisodeItem } from "@/components/episode-list";
 import { animeArtFallback } from "@/lib/media-art";
 
 interface PageProps { params: Promise<{ source: string; slug: string }> }
@@ -35,8 +37,12 @@ async function AnimeKitaDetailPage({ source, slug }: { source: EnabledSourceId; 
       <h1 className="text-3xl font-black leading-tight text-white sm:text-4xl md:text-6xl">{data.judul}</h1>
       <p className="mt-4 max-w-3xl whitespace-pre-line leading-7 text-white/65 sm:leading-8">{data.sinopsis}</p>
       {firstEpisode ? <Link href={`/s/${source}/watch/${encodeURIComponent(cleanSlug(firstEpisode.url ?? firstEpisode.id))}?series=${encodeURIComponent(data.series_id ?? slug)}&episode=${encodeURIComponent(String(firstEpisode.ch ?? "1"))}`} className="wuzz-button mt-6 inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-black transition hover:-translate-y-0.5"><Play className="size-4 fill-white" />Tonton episode {firstEpisode.ch}</Link> : null}
+      <BookmarkDetailButton card={{ title: data.judul ?? slug, poster: art.cover ?? data.cover, banner: art.banner, slug, source, score: (data.rating ?? data.score) != null ? String(data.rating ?? data.score) : undefined }} />
       <div className="mt-6 flex flex-wrap gap-2">{genres.map((genre) => <Link key={genre} href={`/genres/${genreSlug(genre)}`} className="rounded-full border border-sky-300/20 bg-sky-300/10 px-3 py-1 text-sm text-sky-100 transition hover:bg-sky-300/18">{genre}</Link>)}</div>
-      <div className="mt-8 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">{(data.chapter ?? []).map((ep) => <Link key={ep.url ?? ep.id} href={`/s/${source}/watch/${encodeURIComponent(cleanSlug(ep.url ?? ep.id))}?series=${encodeURIComponent(data.series_id ?? slug)}&episode=${encodeURIComponent(String(ep.ch ?? "1"))}`} className="glass-card rounded-2xl px-4 py-3 transition hover:-translate-y-1 hover:border-sky-300/40"><p className="font-bold text-white">Episode {ep.ch}</p><p className="mt-1 text-xs text-white/45">{ep.date}</p></Link>)}</div>
+      <EpisodeList source={source} episodes={(data.chapter ?? []).map((ep): EpisodeItem => {
+        const eid = cleanSlug(ep.url ?? ep.id);
+        return { id: String(ep.url ?? ep.id ?? ep.ch), watchEpisodeId: eid, href: `/s/${source}/watch/${encodeURIComponent(eid)}?series=${encodeURIComponent(data.series_id ?? slug)}&episode=${encodeURIComponent(String(ep.ch ?? "1"))}`, title: `Episode ${ep.ch}`, sub: ep.date ? String(ep.date) : undefined };
+      })} />
     </div>
   </section></main>;
 }
@@ -52,7 +58,11 @@ async function BellDetailPage({ source, slug }: { source: EnabledSourceId; slug:
       <RatingBadge rating={typeof data.score === "object" ? String(data.score?.value ?? "-") : String(data.score ?? "-")} />
       <h1 className="text-3xl font-black leading-tight text-white sm:text-4xl md:text-6xl">{data.title}</h1>
       <p className="mt-4 max-w-3xl whitespace-pre-line leading-7 text-white/65 sm:leading-8">{synopsis}</p>
-      <div className="mt-8 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">{(data.episodeList ?? []).map((ep) => <Link key={ep.episodeId ?? ep.href ?? ep.title} href={`/s/${source}/watch/${encodeURIComponent(ep.episodeId ?? cleanSlug(ep.href) ?? "")}?series=${encodeURIComponent(slug)}`} className="glass-card rounded-2xl px-4 py-3 transition hover:-translate-y-1 hover:border-sky-300/40"><p className="font-bold text-white">{ep.title ?? ep.episode}</p><p className="mt-1 text-xs text-white/45">{ep.releasedOn}</p></Link>)}</div>
+      <BookmarkDetailButton card={{ title: data.title ?? slug, poster: art.cover ?? data.poster ?? data.thumbnail, banner: art.banner, slug, source, score: typeof data.score === "object" ? String(data.score?.value ?? "") : String(data.score ?? "") }} />
+      <EpisodeList source={source} episodes={(data.episodeList ?? []).map((ep): EpisodeItem => {
+        const eid = ep.episodeId ?? cleanSlug(ep.href) ?? "";
+        return { id: eid || (ep.title ?? String(ep.episode)), watchEpisodeId: eid, href: `/s/${source}/watch/${encodeURIComponent(eid)}?series=${encodeURIComponent(slug)}`, title: ep.title ?? `Episode ${ep.episode}`, sub: ep.releasedOn };
+      })} />
     </div>
   </section></main>;
 }
@@ -70,8 +80,9 @@ async function WinbuDetailPage({ slug }: { slug: string }) {
       <h1 className="text-3xl font-black leading-tight text-white sm:text-4xl md:text-6xl">{data.title}</h1>
       <p className="mt-4 max-w-3xl whitespace-pre-line leading-7 text-white/65 sm:leading-8">{data.synopsis}</p>
       {watchHref ? <Link href={watchHref} className="wuzz-button mt-6 inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-black transition hover:-translate-y-0.5"><Play className="size-4 fill-white" />Tonton sekarang</Link> : null}
+      <BookmarkDetailButton card={{ title: data.title, poster: art.cover ?? data.image, banner: art.banner, slug, source: "winbu", score: data.rating }} />
       <div className="mt-6 flex flex-wrap gap-2">{data.genres.map((genre) => <Link key={genre.slug} href={`/genres/${genre.slug}`} className="rounded-full border border-sky-300/20 bg-sky-300/10 px-3 py-1 text-sm text-sky-100 transition hover:bg-sky-300/18">{genre.name}</Link>)}</div>
-      <div className="mt-8 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">{data.episodes.map((ep) => <Link key={ep.id} href={`/s/winbu/watch/${encodeURIComponent(ep.id)}?series=${encodeURIComponent(slug)}`} className="glass-card rounded-2xl px-4 py-3 transition hover:-translate-y-1 hover:border-sky-300/40"><p className="font-bold text-white">{ep.title}</p></Link>)}</div>
+      <EpisodeList source="winbu" episodes={data.episodes.map((ep): EpisodeItem => ({ id: ep.id, watchEpisodeId: ep.id, href: `/s/winbu/watch/${encodeURIComponent(ep.id)}?series=${encodeURIComponent(slug)}`, title: ep.title }))} />
     </div>
   </section>
   {data.recommendations.length ? <section className="mx-auto mt-10 grid max-w-7xl grid-cols-2 gap-4 px-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">{data.recommendations.slice(0, 12).map((item) => <AnimeCardView key={`${item.type}-${item.id}`} card={winbuToCard(item)} />)}</section> : null}

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { akEpisode } from "@/lib/animekita";
 import { WatchPlayer, type WatchStream } from "@/components/watch-player";
+import { MarkWatched } from "@/components/mark-watched";
 
 interface PageProps { params: Promise<{ episodeId: string }>; searchParams: Promise<Record<string, string | undefined>> }
 
@@ -19,6 +20,7 @@ export default async function WatchPage({ params, searchParams }: PageProps) {
   );
 
   return <main className="min-h-screen pb-[calc(7rem+env(safe-area-inset-bottom))] pt-28 lg:pb-16">
+    <MarkWatched source="animekita" episodeId={decodeURIComponent(episodeId)} series={query.series} episode={query.episode} title={`Episode ${query.episode ?? ""}`} />
     <section className="mx-auto max-w-7xl px-4 sm:px-5">
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
         <div>
