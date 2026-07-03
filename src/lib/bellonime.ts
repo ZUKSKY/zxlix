@@ -1,4 +1,5 @@
 ﻿import type { DisplayCard } from "@/components/anime-card";
+import { apiFetchJson } from "@/lib/api/http";
 import { cleanSlug, genreSlug } from "@/lib/images";
 import type { EnabledSourceId } from "@/lib/sources";
 
@@ -20,22 +21,14 @@ interface DetailData extends CardLike { japanese?: string; english?: string; syn
 interface EpisodeData extends CardLike { defaultStreamingUrl?: string; server?: { qualities?: Array<{ title?: string; serverList?: Array<{ title?: string; serverId?: string; href?: string }> }> }; prevEpisode?: CardLike; nextEpisode?: CardLike }
 
 async function bellRequest<T>(path: string): Promise<Envelope<T>> {
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 15000);
-  try {
-    const res = await fetch(`${BASE.replace(/\/$/, "")}/${path.replace(/^\//, "")}`, {
-      signal: controller.signal,
-      next: { revalidate: 300 },
-      headers: { Accept: "application/json", "User-Agent": "Mozilla/5.0 zxlix" },
-    });
-    const text = await res.text();
-    if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
-    const json = JSON.parse(text) as Envelope<T>;
-    if (json.ok === false) throw new Error(json.message || "Bellonime request failed");
-    return json;
-  } finally {
-    clearTimeout(timeout);
-  }
+  const json = await apiFetchJson<Envelope<T>>(`${BASE.replace(/\/$/, "")}/${path.replace(/^\//, "")}`, {
+    timeoutMs: 15_000,
+    retries: 1,
+    next: { revalidate: 300 },
+    headers: { Accept: "application/json", "User-Agent": "Mozilla/5.0 zxlix" },
+  });
+  if (json.ok === false) throw new Error(json.message || "Bellonime request failed");
+  return json;
 }
 
 function isBell(source: EnabledSourceId): source is BellSource {
@@ -124,7 +117,7 @@ export async function bellEpisode(source: EnabledSourceId, episodeId: string) {
 
 export async function bellServer(source: EnabledSourceId, serverId: string) {
   if (!isBell(source)) return undefined;
-  const res = await bellRequest<{ url?: string }>(`${source}/server/${encodeURIComponent(serverId)}`);
-  return res.data?.url;
+  const res = await bellRequest<unknown>(`${source}/server/${encodeURIComponent(serverId)}`);
+  return res.data;
 }
 

@@ -79,8 +79,8 @@ export function SiteNav({ source = "all" }: { source?: string }) {
         }`}
       >
         <Link href={base} className="relative z-20 flex items-center gap-3 py-1 text-2xl font-black tracking-tight text-white">
-          <Image src="/brand/zxlix-eye-icon.svg" alt="" width={36} height={36} priority className="size-9 rounded-xl shadow-[0_0_30px_rgba(14,165,233,.55)] ring-1 ring-white/15" />
-          <span className="leading-none">zxlix</span>
+          <Image src="/brand/zxlix-minimal-icon.svg" alt="" width={36} height={36} priority className="size-9 rounded-xl shadow-[0_0_30px_rgba(14,165,233,.55)] ring-1 ring-white/15" />
+          <span className="leading-none tracking-[.16em]">ZXLIX</span>
         </Link>
 
         <nav className="absolute inset-0 hidden flex-1 flex-row items-center justify-center space-x-2 text-sm font-medium text-white/68 transition duration-200 lg:flex">
@@ -96,7 +96,7 @@ export function SiteNav({ source = "all" }: { source?: string }) {
       </motion.div>
 
       <div className="mx-4 flex items-center justify-between rounded-3xl border border-sky-300/15 bg-[#050b14]/95 px-4 py-3 shadow-[0_16px_48px_rgba(0,0,0,.45)] backdrop-blur-xl lg:hidden">
-        <Link href={base} className="flex items-center gap-2 text-xl font-black text-white"><Image src="/brand/zxlix-eye-icon.svg" alt="" width={36} height={36} priority className="size-9 rounded-xl" />zxlix</Link>
+        <Link href={base} className="flex items-center gap-2 text-xl font-black tracking-[.14em] text-white"><Image src="/brand/zxlix-minimal-icon.svg" alt="" width={36} height={36} priority className="size-9 rounded-xl" />ZXLIX</Link>
         <Link href={joinBase(base, "/search")} aria-label="Search" className="grid size-10 place-items-center rounded-full bg-white/[.07] text-white"><Search className="size-5" /></Link>
       </div>
     </motion.header>

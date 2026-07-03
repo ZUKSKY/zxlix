@@ -93,9 +93,27 @@ main, section { position: relative; z-index: 1; }
   box-shadow: 0 24px 90px rgba(0,0,0,.46), inset 0 1px 0 rgba(255,255,255,.06);
 }
 .glass-card:hover { border-color: rgba(56,189,248,.32); }
-.poster-card { transition: transform .35s cubic-bezier(.2,.8,.2,1), box-shadow .35s ease, border-color .35s ease; }
-.poster-card:hover { transform: translateY(-9px) scale(1.025); border-color: rgba(56,189,248,.55); box-shadow: 0 28px 80px rgba(14,165,233,.22); }
-.poster-card::before { content:""; position:absolute; inset:-1px; border-radius:inherit; background:linear-gradient(135deg,rgba(56,189,248,.35),transparent 35%,rgba(29,78,216,.26)); opacity:0; transition:opacity .35s; pointer-events:none; }
+.poster-card {
+  contain: layout paint;
+  transform: translateZ(0);
+  transition: transform .22s ease-out, box-shadow .22s ease-out, border-color .22s ease-out;
+  will-change: transform;
+}
+.poster-card:hover {
+  transform: translate3d(0,-4px,0);
+  border-color: rgba(56,189,248,.38);
+  box-shadow: 0 20px 54px rgba(14,165,233,.14);
+}
+.poster-card::before {
+  content:"";
+  position:absolute;
+  inset:-1px;
+  border-radius:inherit;
+  background:linear-gradient(135deg,rgba(56,189,248,.24),transparent 42%,rgba(29,78,216,.18));
+  opacity:0;
+  transition:opacity .22s ease-out;
+  pointer-events:none;
+}
 .poster-card:hover::before { opacity:1; }
 .wuzz-panel {
   border: 1px solid var(--line);

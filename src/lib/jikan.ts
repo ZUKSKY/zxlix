@@ -1,3 +1,5 @@
+import { apiFetchJson } from "@/lib/api/http";
+
 export interface JikanAnime {
   mal_id: number;
   url?: string;
@@ -19,20 +21,15 @@ interface JikanDetailResponse { data?: JikanAnime }
 
 const BASE = "https://api.jikan.moe/v4";
 
+// Jikan hard limit: 3 req/sec, 60 req/min → serialize at ~400ms interval.
 async function jikanRequest<T>(path: string): Promise<T> {
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 10000);
-  try {
-    const res = await fetch(`${BASE}/${path.replace(/^\//, "")}`, {
-      signal: controller.signal,
-      cache: "force-cache",
-      headers: { Accept: "application/json" },
-    });
-    if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
-    return await res.json() as T;
-  } finally {
-    clearTimeout(timeout);
-  }
+  return apiFetchJson<T>(`${BASE}/${path.replace(/^\//, "")}`, {
+    timeoutMs: 10_000,
+    retries: 1,
+    minIntervalMs: 400,
+    cache: "force-cache",
+    headers: { Accept: "application/json" },
+  });
 }
 
 export async function jikanSearch(q: string, limit = 18, page = 1) {

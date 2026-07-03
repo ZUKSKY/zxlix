@@ -28,9 +28,9 @@ export async function SourceHome({ source }: { source: CatalogSourceId }) {
       <div className="absolute inset-x-0 bottom-0 h-56 bg-gradient-to-t from-[#030711] to-transparent" />
       <div className="mx-auto grid max-w-7xl items-center gap-10 px-5 py-16 lg:grid-cols-[1.05fr_.95fr]">
         <div className="relative z-10 max-w-3xl animate-float-up">
-          <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-sky-300/25 bg-sky-300/10 px-4 py-2 text-sm font-black text-sky-100 shadow-[0_0_35px_rgba(14,165,233,.16)] backdrop-blur"><Sparkles className="size-4" /> Catalog HD</div>
-          <h1 className="text-4xl font-black leading-[.94] tracking-tight text-white drop-shadow-[0_4px_18px_rgba(0,0,0,.7)] sm:text-5xl md:text-7xl">Tontonan seru, siap ditonton.</h1>
-          <p className="mt-5 max-w-xl text-lg leading-8 text-white/67">Catalog lebih luas, search judul lama, genre, pagination, dan server streaming rapi.</p>
+          <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-sky-300/20 bg-white/[.035] px-4 py-2 text-sm font-black text-sky-100 backdrop-blur"><Sparkles className="size-4" /> Multi-source anime API</div>
+          <h1 className="max-w-3xl text-4xl font-black leading-[.94] tracking-[-.06em] text-white drop-shadow-[0_4px_18px_rgba(0,0,0,.7)] sm:text-5xl md:text-7xl">Streaming anime minimal, cepat, rapi.</h1>
+          <p className="mt-5 max-w-xl text-lg leading-8 text-white/62">Satu interface untuk update episode, movie, genre, jadwal, pencarian, bookmark, dan server streaming pilihan.</p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link href={joinBase(base, "/latest")} className="blue-glow wuzz-button inline-flex items-center gap-2 rounded-full px-6 py-3 font-black transition hover:scale-105"><Play className="size-5 fill-white" />Mulai</Link>
             <Link href={joinBase(base, "/search")} className="inline-flex items-center gap-2 rounded-full border border-sky-300/20 bg-[#050b14]/70 px-6 py-3 font-bold text-white shadow-[inset_0_1px_0_rgba(255,255,255,.06)] backdrop-blur transition hover:border-sky-300/50 hover:bg-sky-500/12"><Search className="size-5" />Cari</Link>

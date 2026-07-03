@@ -1,4 +1,6 @@
-﻿export interface AkAnime {
+﻿import { apiFetchJson } from "@/lib/api/http";
+
+export interface AkAnime {
   id?: string | number;
   url?: string;
   link?: string;
@@ -62,34 +64,14 @@ function cleanSourceSlug(value: unknown) {
 }
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  let lastError: unknown;
-  for (let attempt = 0; attempt < 2; attempt += 1) {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 10000);
-    try {
-      const res = await fetch(`${BASE}/${path.replace(/^\//, "")}`, {
-        ...init,
-        signal: controller.signal,
-        cache: init?.cache,
-        next: init?.method === "POST" || init?.body ? undefined : { revalidate: 300 },
-        headers: { ...headers, ...(init?.headers ?? {}) },
-      });
-      if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
-      const text = await res.text();
-      try {
-        return JSON.parse(text) as T;
-      } catch {
-        const preview = text.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim().slice(0, 120);
-        throw new Error(preview || "Invalid JSON response");
-      }
-    } catch (error) {
-      lastError = error;
-      if (attempt === 0) await new Promise((resolve) => setTimeout(resolve, 400));
-    } finally {
-      clearTimeout(timeout);
-    }
-  }
-  throw lastError instanceof Error ? lastError : new Error("API gagal");
+  return apiFetchJson<T>(`${BASE}/${path.replace(/^\//, "")}`, {
+    ...init,
+    timeoutMs: 10_000,
+    retries: 1,
+    cache: init?.cache,
+    next: init?.method === "POST" || init?.body ? undefined : { revalidate: 300 },
+    headers: { ...headers, ...(init?.headers ?? {}) },
+  });
 }
 
 export function normalizeAnime(input: unknown): AnimeKitaItem {

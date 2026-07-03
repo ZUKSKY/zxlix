@@ -5,7 +5,7 @@ export type StreamKind = "video" | "hls" | "iframe" | "external" | "download";
 const DOWNLOAD_HINT = /(\bdownload\b|[?&](dl|attachment|download)=|[?&]export=download|response-content-disposition=attachment|\/dl\/|\/download\/|\/get\/|drive\.google\.com\/uc\?|pixeldrain\.com\/(api|u)\/|gofile\.io\/d\/|mega\.nz|mediafire|zippyshare|krakenfiles|katfile|rapidgator|nitroflare|turbobit|1fichier|send\.cm|uploadrar|acefile|kfiles|terabox|drop\.download|doodrive|\.zip(\?|#|$)|\.rar(\?|#|$)|\.7z(\?|#|$)|\.iso(\?|#|$))/i;
 
 // Embed/streaming hosts that should render inside an iframe.
-const IFRAME_HINT = /(youtube|youtu\.be|vimeo|dailymotion|ok\.ru|streamtape|streamsb|dood|filemoon|mp4upload|vidhide|embedly|blogger|drive\.google\.com\/file|\/embed|\/player|streaming)/i;
+const IFRAME_HINT = /(youtube|youtu\.be|vimeo|dailymotion|ok\.ru|streamtape|streamsb|streamwish|dood|filemoon|mp4upload|vidhide|vidguard|voe\.sx|uqload|yourupload|mixdrop|sendvid|embedly|blogger|drive\.google\.com\/file|\/embed|\/player|streaming)/i;
 
 export function detectStreamKind(link: string, kind?: StreamKind): StreamKind {
   if (kind) return kind;

@@ -27,34 +27,48 @@ function streamKind(link: string): WatchStream["kind"] {
 
 async function AnimeKitaWatch({ source, episodeId, query }: { source: string; episodeId: string; query: Record<string, string | undefined> }) {
   const data = await akEpisode(episodeId, query.series ?? "", query.episode ?? "1").catch(() => null);
-  const streams: WatchStream[] = Object.entries(data?.streams ?? {}).flatMap(([quality, items]) =>
+  const streams: WatchStream[] = uniqueStreams(Object.entries(data?.streams ?? {}).flatMap(([quality, items]) =>
     items.map((stream, index) => ({ quality, label: `${quality} • Server ${index + 1}`, link: stream.link ?? "", size: stream.size_kb, kind: streamKind(stream.link ?? "") })),
-  );
+  ));
   return <WatchShell title={`Nonton Episode ${query.episode ?? ""}`} back={query.series ? `/s/${source}/anime/${encodeURIComponent(query.series)}` : "/latest"} streams={streams} source={source} episodeId={episodeId} series={query.series} episode={query.episode} />;
 }
 
 function extractBellUrl(value: unknown): string {
+  if (typeof value === "string") return value;
   if (!value || typeof value !== "object") return "";
   const record = value as Record<string, unknown>;
-  for (const key of ["url", "link", "iframe", "embed", "streamingUrl", "defaultStreamingUrl"]) {
+  for (const key of ["url", "link", "iframe", "embed", "streamingUrl", "defaultStreamingUrl", "src"]) {
     if (typeof record[key] === "string") return String(record[key]);
   }
-  if (record.data && typeof record.data === "object") return extractBellUrl(record.data);
+  for (const key of ["data", "result", "stream", "server"]) {
+    const nested = extractBellUrl(record[key]);
+    if (nested) return nested;
+  }
   return "";
+}
+
+function uniqueStreams(streams: WatchStream[]) {
+  const seen = new Set<string>();
+  return streams.filter((stream) => {
+    const link = stream.link.trim();
+    if (!link || seen.has(link)) return false;
+    seen.add(link);
+    return true;
+  });
 }
 
 async function BellWatch({ source, episodeId, query }: { source: EnabledSourceId; episodeId: string; query: Record<string, string | undefined> }) {
   const data = await bellEpisode(source, episodeId).catch(() => null);
   const serverItems = data?.server?.qualities?.flatMap((quality) => (quality.serverList ?? []).map((server) => ({ quality: quality.title ?? "Server", server }))) ?? [];
-  const resolved = await Promise.allSettled(serverItems.slice(0, 16).map(async ({ quality, server }, index): Promise<WatchStream> => {
-    const response = server.serverId ? await bellServer(source, server.serverId).catch(() => "") : server.href;
-    const link = typeof response === "string" ? response : extractBellUrl(response);
-    return { quality, label: `${quality} • Server ${index + 1}`, link, kind: streamKind(link) };
+  const resolved = await Promise.allSettled(serverItems.slice(0, 12).map(async ({ quality, server }, index): Promise<WatchStream> => {
+    const response = server.serverId ? await bellServer(source, server.serverId).catch(() => undefined) : undefined;
+    const link = extractBellUrl(response) || extractBellUrl(server.href);
+    return { quality, label: `${quality} • ${server.title ?? `Server ${index + 1}`}`, link, kind: streamKind(link) };
   }));
-  const streams: WatchStream[] = [
+  const streams: WatchStream[] = uniqueStreams([
     ...(data?.defaultStreamingUrl ? [{ quality: "Auto", label: "Auto • Default", link: data.defaultStreamingUrl, kind: streamKind(data.defaultStreamingUrl) }] : []),
     ...resolved.flatMap((item) => item.status === "fulfilled" ? [item.value] : []),
-  ];
+  ]);
   return <WatchShell title={data?.title ?? "Nonton episode"} back={query.series ? `/s/${source}/anime/${encodeURIComponent(query.series)}` : "/latest"} streams={streams} source={source} episodeId={episodeId} series={query.series} title2={data?.title} />;
 }
 

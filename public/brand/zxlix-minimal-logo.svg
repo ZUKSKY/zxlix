@@ -1,0 +1,8 @@
+<svg width="640" height="160" viewBox="0 0 640 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect x="8" y="8" width="144" height="144" rx="34" fill="#030711"/>
+  <rect x="14" y="14" width="132" height="132" rx="29" fill="#07111f" stroke="#38bdf8" stroke-opacity=".18" stroke-width="4"/>
+  <path d="M46 48H112L54 112H118" stroke="#38bdf8" stroke-width="18" stroke-linecap="square" stroke-linejoin="miter"/>
+  <path d="M80 64L108 80L80 96V64Z" fill="#E0F7FF"/>
+  <text x="184" y="104" fill="#F8FAFC" font-family="Inter, Manrope, Arial, sans-serif" font-size="70" font-weight="800" letter-spacing="6">ZXLIX</text>
+  <rect x="184" y="122" width="70" height="6" rx="3" fill="#38bdf8"/>
+</svg>

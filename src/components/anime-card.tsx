@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Clock3, Play, PlayCircle, Star } from "lucide-react";
+import { Clock3, PlayCircle, Star } from "lucide-react";
 import { PosterImage } from "@/components/poster-image";
 import { BookmarkButton } from "@/components/bookmark-button";
 import { WatchedBadge } from "@/components/watched-badge";
@@ -63,19 +63,18 @@ export function AnimeCardView({ card }: { card: DisplayCard }) {
   const subBadges = uniqueBadges([hideSourceText(card.status), episodeBadge(card.episode), hideSourceText(card.duration), hideSourceText(card.meta)]).slice(0, 2);
   const footerMeta = uniqueBadges([hideSourceText(cleanType(card.type)), ...subBadges]).join(" · ");
   const visibleGenres = (card.genres ?? []).map((genre) => hideSourceText(genre)).filter(Boolean).slice(0, 2);
-  const cta = card.episodeId ? "Tonton" : "Detail";
 
-  return <Link href={href} className="poster-card group relative block overflow-hidden rounded-[1.15rem] border border-sky-300/15 bg-[#050b14]/85 shadow-[0_18px_50px_rgba(0,0,0,.32)] sm:rounded-[1.35rem]">
+  return <Link href={href} className="poster-card group relative block overflow-hidden rounded-[1.15rem] border border-sky-300/15 bg-[#050b14] shadow-[0_18px_50px_rgba(0,0,0,.30)] sm:rounded-[1.35rem]">
     <div className="relative aspect-[2/3] overflow-hidden bg-slate-950">
-      <PosterImage src={card.poster} sources={[card.banner]} alt={card.title} className="size-full object-cover transition duration-700 group-hover:scale-110" />
-      <div className="absolute inset-0 bg-gradient-to-t from-[#020617] via-[#020617]/15 to-transparent opacity-95" />
-      <div className="absolute inset-0 grid place-items-center bg-sky-500/0 opacity-0 transition duration-300 group-hover:bg-sky-500/12 group-hover:opacity-100"><PlayCircle className="size-12 text-white drop-shadow-2xl sm:size-14" /></div>
+      <PosterImage src={card.poster} sources={[card.banner]} alt={card.title} className="size-full transform-gpu object-cover transition-transform duration-500 ease-out group-hover:scale-[1.035]" />
+      <div className="absolute inset-0 bg-gradient-to-t from-[#020617] via-[#020617]/18 to-transparent opacity-90" />
+      <div className="absolute inset-0 grid place-items-center bg-sky-500/[.04] opacity-0 transition-opacity duration-200 group-hover:opacity-100"><PlayCircle className="size-12 text-white drop-shadow-2xl sm:size-14" /></div>
       {card.score ? <span className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full border border-white/10 bg-black/60 px-2 py-1 text-[10px] font-bold text-sky-100 backdrop-blur sm:left-3 sm:top-3 sm:text-xs"><Star className="size-3 fill-sky-300 text-sky-300" />{card.score}</span> : null}
       {topBadge ? <span className="absolute right-2 top-2 max-w-[58%] truncate rounded-full bg-sky-500/90 px-2 py-1 text-[10px] font-bold text-white shadow-lg shadow-sky-500/30 sm:right-3 sm:top-3 sm:text-xs">{topBadge}</span> : null}
       {subBadges.length ? <div className="absolute bottom-12 right-2 flex max-w-[72%] flex-wrap justify-end gap-1 sm:bottom-14 sm:right-3">
         {subBadges.map((badge) => <span key={badge} className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-black/62 px-2 py-1 text-[9px] font-bold text-white/90 backdrop-blur"><Clock3 className="size-3 text-sky-300" />{badge}</span>)}
       </div> : null}
-      <span className="absolute bottom-2 left-2 inline-flex translate-y-4 items-center gap-1 rounded-full bg-white px-2.5 py-1.5 text-[10px] font-black text-slate-950 opacity-0 shadow-xl transition duration-300 group-hover:translate-y-0 group-hover:opacity-100 sm:bottom-3 sm:left-3 sm:text-xs"><Play className="size-3 fill-slate-950" />{cta}</span>
+
       <BookmarkButton card={card} />
       <WatchedBadge source={card.source} episodeId={card.episodeId} />
     </div>
