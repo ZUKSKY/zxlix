@@ -10,18 +10,20 @@ export function MarkWatched({
   series,
   title,
   episode,
+  poster,
 }: {
   source: string;
   episodeId: string;
   series?: string;
   title?: string;
   episode?: string;
+  poster?: string;
 }) {
   const markWatched = useHistory((state) => state.markWatched);
 
   useEffect(() => {
-    markWatched({ id: historyId(source, episodeId), source, series, title, episode });
-  }, [markWatched, source, episodeId, series, title, episode]);
+    markWatched({ id: historyId(source, episodeId), source, series, title, episode, poster });
+  }, [markWatched, source, episodeId, series, title, episode, poster]);
 
   return null;
 }

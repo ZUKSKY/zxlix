@@ -7,8 +7,6 @@ interface PosterLike { title: string; poster?: string; banner?: string }
 
 const ANILIST = "https://graphql.anilist.co";
 const KITSU = "https://kitsu.io/api/edge/anime";
-const JIKAN = "https://api.jikan.moe/v4/anime";
-const WIKIPEDIA = "https://en.wikipedia.org/w/api.php";
 
 // In-memory memo so repeated renders don't refetch the same title.
 const ART_TTL = 6 * 60 * 60 * 1000;
@@ -23,6 +21,20 @@ function cleanMediaTitle(title?: string) {
     .replace(/\bs\d+\b/ig, " ")
     .replace(/\s+/g, " ")
     .trim();
+}
+
+function titleKey(value?: string) {
+  return cleanMediaTitle(value).toLowerCase().replace(/[^a-z0-9]+/g, "");
+}
+
+function likelySameTitle(requested: string, candidate?: string) {
+  const left = titleKey(requested);
+  const right = titleKey(candidate);
+  if (!left || !right) return false;
+  if (left === right) return true;
+  const short = left.length < right.length ? left : right;
+  const long = left.length < right.length ? right : left;
+  return short.length >= 12 && long.includes(short);
 }
 
 export function looksLowQuality(url?: string) {
@@ -40,6 +52,7 @@ async function anilistArt(search: string, signal?: AbortSignal): Promise<AnimeIm
     body: JSON.stringify({
       query: `query ($search: String) {
         Media(search: $search, type: ANIME) {
+          title { romaji english native }
           coverImage { extraLarge large }
           bannerImage
         }
@@ -48,16 +61,23 @@ async function anilistArt(search: string, signal?: AbortSignal): Promise<AnimeIm
     }),
   });
   if (!response.ok) return {};
-  const json = await response.json() as { data?: { Media?: { coverImage?: { extraLarge?: string; large?: string }; bannerImage?: string } } };
-  return { cover: json.data?.Media?.coverImage?.extraLarge ?? json.data?.Media?.coverImage?.large, banner: json.data?.Media?.bannerImage };
+  const json = await response.json() as { data?: { Media?: { title?: { romaji?: string; english?: string; native?: string }; coverImage?: { extraLarge?: string; large?: string }; bannerImage?: string } } };
+  const media = json.data?.Media;
+  const titles = [media?.title?.romaji, media?.title?.english, media?.title?.native];
+  if (!titles.some((title) => likelySameTitle(search, title))) return {};
+  return { cover: media?.coverImage?.extraLarge ?? media?.coverImage?.large, banner: media?.bannerImage };
 }
 
 async function kitsuArt(search: string, signal?: AbortSignal): Promise<AnimeImageResult> {
-  const url = `${KITSU}?filter[text]=${encodeURIComponent(search)}&page[limit]=1`;
+  const url = `${KITSU}?filter[text]=${encodeURIComponent(search)}&page[limit]=3`;
   const response = await fetch(url, { cache: "force-cache", signal, headers: { accept: "application/vnd.api+json" } });
   if (!response.ok) return {};
-  const json = await response.json() as { data?: Array<{ attributes?: { posterImage?: Record<string, string>; coverImage?: Record<string, string> } }> };
-  const attrs = json.data?.[0]?.attributes;
+  const json = await response.json() as { data?: Array<{ attributes?: { canonicalTitle?: string; titles?: Record<string, string>; posterImage?: Record<string, string>; coverImage?: Record<string, string> } }> };
+  const match = json.data?.find((item) => {
+    const attrs = item.attributes;
+    return [attrs?.canonicalTitle, ...Object.values(attrs?.titles ?? {})].some((title) => likelySameTitle(search, title));
+  });
+  const attrs = match?.attributes;
   return { cover: attrs?.posterImage?.original ?? attrs?.posterImage?.large, banner: attrs?.coverImage?.original ?? attrs?.coverImage?.large };
 }
 

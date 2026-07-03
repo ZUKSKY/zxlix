@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Bookmark, CalendarDays, Clapperboard, Film, Home, Search, Tags } from "lucide-react";
+import { Bookmark, CalendarDays, Clapperboard, Compass, Film, Home, Shuffle, Search, Tags } from "lucide-react";
 import { motion, useMotionValueEvent, useScroll } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 
@@ -18,6 +18,7 @@ function menus(base: string) {
     { href: joinBase(base, "/movies"), label: "Movie", icon: Film },
     { href: joinBase(base, "/schedule"), label: "Jadwal", icon: CalendarDays },
     { href: joinBase(base, "/genres"), label: "Genre", icon: Tags },
+    { href: "/discover/trending", label: "Jelajah", icon: Compass },
     { href: "/bookmarks", label: "Simpan", icon: Bookmark },
   ];
 }
@@ -91,17 +92,21 @@ export function SiteNav({ source = "all" }: { source?: string }) {
         </nav>
 
         <div className="relative z-20 flex items-center gap-2">
+          <Link href="/api/random" aria-label="Random anime" className="grid size-9 place-items-center rounded-full bg-white/[.07] text-white transition hover:bg-sky-400/15 hover:text-sky-100"><Shuffle className="size-4.5" /></Link>
           <Link href={joinBase(base, "/search")} aria-label="Search" className="grid size-9 place-items-center rounded-full bg-white/[.07] text-white transition hover:bg-sky-400/15 hover:text-sky-100"><Search className="size-4.5" /></Link>
         </div>
       </motion.div>
 
       <div className="mx-4 flex items-center justify-between rounded-3xl border border-sky-300/15 bg-[#050b14]/95 px-4 py-3 shadow-[0_16px_48px_rgba(0,0,0,.45)] backdrop-blur-xl lg:hidden">
         <Link href={base} className="flex items-center gap-2 text-xl font-black tracking-[.14em] text-white"><Image src="/brand/zxlix-minimal-icon.svg" alt="" width={36} height={36} priority className="size-9 rounded-xl" />ZXLIX</Link>
-        <Link href={joinBase(base, "/search")} aria-label="Search" className="grid size-10 place-items-center rounded-full bg-white/[.07] text-white"><Search className="size-5" /></Link>
+        <div className="flex items-center gap-2">
+          <Link href="/api/random" aria-label="Random anime" className="grid size-10 place-items-center rounded-full bg-white/[.07] text-white"><Shuffle className="size-5" /></Link>
+          <Link href={joinBase(base, "/search")} aria-label="Search" className="grid size-10 place-items-center rounded-full bg-white/[.07] text-white"><Search className="size-5" /></Link>
+        </div>
       </div>
     </motion.header>
 
-    <nav className="fixed bottom-4 left-4 right-4 z-50 grid grid-cols-6 rounded-[1.5rem] border border-sky-300/15 bg-[#050b14]/95 p-2 text-center text-[11px] font-bold text-white/75 shadow-[0_20px_70px_rgba(2,132,199,.2)] backdrop-blur-2xl lg:hidden">
+    <nav className="fixed bottom-4 left-4 right-4 z-50 grid grid-cols-7 rounded-[1.5rem] border border-sky-300/15 bg-[#050b14]/95 p-2 text-center text-[11px] font-bold text-white/75 shadow-[0_20px_70px_rgba(2,132,199,.2)] backdrop-blur-2xl lg:hidden">
       {menuItems.map(({ href, label, icon: Icon }) => <Link key={href} href={href} className="flex flex-col items-center gap-1 rounded-2xl px-2 py-2 transition hover:bg-sky-400/15 hover:text-white"><Icon className="size-4 text-sky-300" />{label}</Link>)}
     </nav>
   </>;

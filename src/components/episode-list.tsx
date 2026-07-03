@@ -18,7 +18,7 @@ export interface EpisodeItem {
 
 const PAGE = 24;
 
-export function EpisodeList({ source, episodes }: { source: string; episodes: EpisodeItem[] }) {
+export function EpisodeList({ source, episodes, label = "Episode" }: { source: string; episodes: EpisodeItem[]; label?: string }) {
   const hydrated = useHydrated();
   const items = useHistory((state) => state.items);
   const [shown, setShown] = useState(PAGE);
@@ -40,7 +40,7 @@ export function EpisodeList({ source, episodes }: { source: string; episodes: Ep
   return (
     <div className="mt-8">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <h2 className="text-lg font-black text-white">Daftar Episode <span className="text-sm font-bold text-white/40">({episodes.length})</span></h2>
+        <h2 className="text-lg font-black text-white">{label === "Movie" ? "Movie" : "Daftar Episode"} <span className="text-sm font-bold text-white/40">({episodes.length})</span></h2>
         {episodes.length > 12 ? (
           <label className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[.04] px-3 py-1.5 text-sm text-white/70 focus-within:border-sky-300/40">
             <Search className="size-4 text-sky-300/70" />

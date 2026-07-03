@@ -6,10 +6,19 @@ import { PosterImage } from "@/components/poster-image";
 import { imageProxy } from "@/lib/images";
 import { sourceHome } from "@/lib/unified-catalog";
 import { type CatalogSourceId } from "@/lib/sources";
+import type { DisplayCard } from "@/components/anime-card";
 
 function joinBase(base: string, path = "") {
   if (!path) return base || "/";
   return `${base === "/" ? "" : base}${path}`;
+}
+
+function cardHref(card: DisplayCard) {
+  const slug = card.slug ?? card.animeId ?? "";
+  const sourceBase = card.source && card.source !== "metadata" ? `/s/${card.source}` : "";
+  if (card.playable === false) return `/search?q=${encodeURIComponent(card.title)}`;
+  if (card.episodeId) return `${sourceBase}/watch/${encodeURIComponent(card.episodeId)}?series=${encodeURIComponent(slug)}`;
+  return `${sourceBase}/anime/${encodeURIComponent(slug)}`;
 }
 
 export async function SourceHome({ source }: { source: CatalogSourceId }) {
@@ -42,13 +51,13 @@ export async function SourceHome({ source }: { source: CatalogSourceId }) {
         </div>
         {hero ? <div className="relative z-10 hidden justify-end lg:flex">
           <div className="blue-orb absolute right-16 top-8 size-24 rounded-full bg-sky-400/20 blur-2xl" />
-          <div className="glass-card w-[380px] rotate-3 rounded-[2rem] p-4 transition duration-500 hover:rotate-0 hover:scale-[1.02]">
+          <Link href={cardHref(hero)} className="glass-card group w-[380px] rotate-3 rounded-[2rem] p-4 transition duration-500 hover:rotate-0 hover:scale-[1.02]">
             <div className="relative overflow-hidden rounded-[1.4rem]">
-              <PosterImage src={hero.poster} sources={[hero.banner]} alt={hero.title} className="aspect-[2/3] w-full object-cover" />
+              <PosterImage src={hero.poster} sources={[hero.banner]} alt={hero.title} className="aspect-[2/3] w-full object-cover transition-transform duration-500 group-hover:scale-[1.035]" />
               <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
               <div className="absolute bottom-4 left-4 right-4"><p className="mb-2 inline-flex items-center gap-1 rounded-full bg-sky-500 px-3 py-1 text-xs font-black text-white"><Star className="size-3 fill-white" />Pilihan</p><h2 className="line-clamp-2 text-2xl font-black text-white">{hero.title}</h2></div>
             </div>
-          </div>
+          </Link>
         </div> : null}
       </div>
     </section>

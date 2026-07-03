@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { SiteNav } from "@/components/site-nav";
+import { PwaRegister } from "@/components/pwa-register";
 import "./globals.css";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
@@ -17,6 +18,9 @@ export const metadata: Metadata = {
     ],
     apple: [{ url: "/apple-icon.png", sizes: "180x180", type: "image/png" }],
   },
+  manifest: "/manifest.webmanifest",
+  applicationName: "ZXLIX",
+  appleWebApp: { capable: true, title: "ZXLIX", statusBarStyle: "black-translucent" },
   openGraph: {
     title: "ZXLIX",
     description: "Streaming catalog modern dengan update episode, movie, genre, jadwal, dan pencarian cepat.",
@@ -25,5 +29,5 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html lang="id"><body className={`${geistSans.variable} ${geistMono.variable} antialiased`}><SiteNav source="all" />{children}</body></html>;
+  return <html lang="id"><body className={`${geistSans.variable} ${geistMono.variable} antialiased`}><PwaRegister /><SiteNav source="all" />{children}</body></html>;
 }

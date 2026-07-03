@@ -15,6 +15,7 @@ export interface BookmarkState {
   remove: (key: string) => void;
   toggle: (card: DisplayCard) => void;
   clear: () => void;
+  importItems: (items: Record<string, DisplayCard>) => void;
   _hasHydrated: boolean;
   _setHydrated: (value: boolean) => void;
 }
@@ -36,6 +37,7 @@ export const useBookmarks = create<BookmarkState>()(
         else get().add(card);
       },
       clear: () => set({ items: {} }),
+      importItems: (items) => set((state) => ({ items: { ...items, ...state.items } })),
       _hasHydrated: false,
       _setHydrated: (value) => set({ _hasHydrated: value }),
     }),
