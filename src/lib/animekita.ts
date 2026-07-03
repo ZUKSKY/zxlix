@@ -123,14 +123,26 @@ export const akMovies = () => akList("movies") as Promise<AnimeKitaItem[]>;
 export const akOngoing = (page = 1) => akList("ongoing", { page: String(page) }) as Promise<AnimeKitaItem[]>;
 export const akSearch = (keyword: string) => akList("search", { keyword }) as Promise<AnimeKitaItem[]>;
 
+function usableDetail(item?: AkDetail) {
+  if (!item?.judul && !item?.title && !item?.anime_name) return undefined;
+  if (!item.series_id && !item.cover && !item.chapter?.length) return undefined;
+  return item;
+}
+
 export async function akDetail(slug: string) {
-  const body = JSON.stringify({ get: "top", post_type: "1", post_id: slug, token: TOKEN });
-  const res = await request<{ data?: AkDetail[] }>(`series.php?url=${encodeURIComponent(slug)}`, {
-    method: "POST",
-    body,
-    headers: { "content-type": "text/plain; charset=utf-8" },
-  });
-  return res.data?.[0];
+  const clean = slug.replace(/^\/+|\/+$/g, "");
+  const candidates = Array.from(new Set([slug, clean, `${clean}/`].filter(Boolean)));
+  for (const candidate of candidates) {
+    const body = JSON.stringify({ get: "top", post_type: "1", post_id: candidate, token: TOKEN });
+    const res = await request<{ data?: AkDetail[] }>(`series.php?url=${encodeURIComponent(candidate)}`, {
+      method: "POST",
+      body,
+      headers: { "content-type": "text/plain; charset=utf-8" },
+    }).catch(() => null);
+    const detail = usableDetail(res?.data?.[0]);
+    if (detail) return detail;
+  }
+  return undefined;
 }
 
 export async function akEpisode(episodeId: string, series = "", episode = "1") {
