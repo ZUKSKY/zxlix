@@ -42,3 +42,7 @@ next-env.d.ts
 
 # local API scratch dumps
 /tmp-api/
+
+# Hermes/editor temp folders that can crash Turbopack if created under src/
+.hermes-tmp*/
+**/.hermes-tmp*/
