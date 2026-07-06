@@ -29,5 +29,5 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html lang="id"><body className={`${geistSans.variable} ${geistMono.variable} antialiased`}><PwaRegister /><SiteNav source="all" />{children}</body></html>;
+  return <html lang="id" data-scroll-behavior="smooth"><body className={`${geistSans.variable} ${geistMono.variable} antialiased`}><PwaRegister /><SiteNav source="all" />{children}</body></html>;
 }

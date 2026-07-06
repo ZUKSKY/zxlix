@@ -67,16 +67,13 @@ export function SiteNav({ source = "all" }: { source?: string }) {
         animate={{
           backdropFilter: visible ? "blur(16px)" : "none",
           boxShadow: visible ? navbarShadow : "none",
-          width: visible ? "55%" : "100%",
+          width: "calc(100% - 2rem)",
           y: visible ? 8 : 0,
         }}
         transition={{ type: "spring", stiffness: 200, damping: 50 }}
-        style={{
-          minWidth: visible ? "900px" : "800px",
-        }}
-        className={`relative z-[60] mx-auto hidden w-full max-w-7xl flex-row items-center justify-between self-start overflow-hidden rounded-full border px-4 py-2 lg:flex ${visible
-          ? "border-sky-300/15 bg-[#050b14]/95"
-          : "border-transparent bg-transparent"
+        className={`relative z-[60] mx-auto hidden max-w-7xl flex-row items-center justify-between self-start overflow-hidden rounded-full px-4 py-2 lg:flex ${visible
+          ? "border border-sky-300/15 bg-[#050b14]/95"
+          : "border border-transparent bg-transparent"
         }`}
       >
         <Link href={base} className="relative z-20 flex items-center gap-3 py-1 text-2xl font-black tracking-tight text-white">

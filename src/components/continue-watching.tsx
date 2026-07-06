@@ -23,7 +23,7 @@ export function ContinueWatching() {
   if (entries.length === 0) return null;
 
   return (
-    <section className="mx-auto max-w-7xl px-4 py-8 sm:px-5 sm:py-10">
+    <section className="mx-auto max-w-7xl px-4 py-5 sm:px-5 sm:py-7">
       <div className="mb-5 flex items-center justify-between gap-4">
         <div className="flex items-center gap-2">
           <History className="size-5 text-sky-300" />
@@ -41,15 +41,16 @@ export function ContinueWatching() {
         </button>
       </div>
 
-      <div className="-mx-4 flex snap-x gap-3 overflow-x-auto px-4 pb-2 sm:gap-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <div className="flex max-w-full snap-x gap-3 overflow-x-auto pb-2 pr-4 sm:gap-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {entries.map((entry) => {
+          const isMovie = String(entry.episode ?? entry.title ?? "").toLowerCase().includes("movie");
           const href = entry.series
-            ? `/s/${entry.source}/watch/${encodeURIComponent(entry.id.replace(`${entry.source}:`, ""))}?series=${encodeURIComponent(entry.series)}${entry.episode ? `&episode=${encodeURIComponent(entry.episode)}` : ""}`
+            ? `/s/${entry.source}/watch/${encodeURIComponent(entry.id.replace(`${entry.source}:`, ""))}?series=${encodeURIComponent(entry.series)}${entry.episode ? `&episode=${encodeURIComponent(entry.episode)}` : ""}${isMovie ? "&kind=movie" : ""}`
             : `/s/${entry.source}/watch/${encodeURIComponent(entry.id.replace(`${entry.source}:`, ""))}`;
           const percent = progressPercent(entry);
           const remaining = formatRemaining(entry);
           return (
-            <div key={entry.id} className="group relative w-64 shrink-0 snap-start">
+            <div key={entry.id} className="group relative w-[16.5rem] shrink-0 snap-start sm:w-[17.5rem]">
               <Link
                 href={href}
                 className="relative flex items-stretch gap-0 overflow-hidden rounded-2xl border border-sky-300/15 bg-[#050b14]/85 transition hover:-translate-y-1 hover:border-sky-300/40"
@@ -63,8 +64,8 @@ export function ContinueWatching() {
                   <span className="absolute inset-0 grid place-items-center bg-black/35 opacity-0 transition group-hover:opacity-100"><Play className="size-6 fill-white text-white drop-shadow" /></span>
                 </div>
                 <div className="flex min-w-0 flex-1 flex-col justify-center px-3 py-2">
-                  <p className="truncate text-sm font-bold text-white group-hover:text-sky-300">{entry.title ?? "Episode"}</p>
-                  {entry.episode ? <p className="mt-0.5 text-xs text-white/45">Episode {entry.episode}</p> : null}
+                  <p className="truncate text-sm font-bold text-white group-hover:text-sky-300">{isMovie ? (entry.series ?? "Movie") : (entry.title ?? "Episode")}</p>
+                  {entry.episode ? <p className="mt-0.5 text-xs text-white/45">{isMovie ? "Movie" : `Episode ${entry.episode}`}</p> : null}
                   {remaining ? <p className="mt-0.5 text-[11px] font-bold text-sky-300/80">{remaining}</p> : null}
                   {percent !== undefined ? (
                     <div className="mt-1.5 h-1 w-full overflow-hidden rounded-full bg-white/10">

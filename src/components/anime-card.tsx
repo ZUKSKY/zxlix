@@ -51,13 +51,17 @@ function cleanType(value?: string) {
   return text;
 }
 
+function isMovieCard(card: DisplayCard) {
+  return /movie|film/i.test(`${card.type ?? ""} ${card.status ?? ""} ${card.badge ?? ""} ${card.meta ?? ""}`);
+}
+
 export function AnimeCardView({ card }: { card: DisplayCard }) {
   const slug = card.slug ?? card.animeId ?? "";
   const sourceBase = card.source && card.source !== "metadata" ? `/s/${card.source}` : "";
   const href = card.playable === false
     ? `/search?q=${encodeURIComponent(card.title)}`
     : card.episodeId
-      ? `${sourceBase}/watch/${encodeURIComponent(card.episodeId)}?series=${encodeURIComponent(slug)}`
+      ? `${sourceBase}/watch/${encodeURIComponent(card.episodeId)}?series=${encodeURIComponent(slug)}${isMovieCard(card) ? "&kind=movie" : ""}`
       : `${sourceBase}/anime/${encodeURIComponent(slug)}`;
   const topBadge = hideSourceText(card.badge) ?? hideSourceText(cleanType(card.type));
   const subBadges = uniqueBadges([hideSourceText(card.status), episodeBadge(card.episode), hideSourceText(card.duration), hideSourceText(card.meta)]).slice(0, 2);

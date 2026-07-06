@@ -8,6 +8,7 @@ const allowedHostSuffixes = [
   "samehadaku.email",
   "samehadaku.care",
   "otakudesu.cloud",
+  "otakudesu.blog",
   "wp.com",
   "blogger.com",
   "blogspot.com",

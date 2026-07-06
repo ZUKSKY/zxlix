@@ -7,6 +7,7 @@ interface PosterLike { title: string; poster?: string; banner?: string }
 
 const ANILIST = "https://graphql.anilist.co";
 const KITSU = "https://kitsu.io/api/edge/anime";
+const JIKAN = "https://api.jikan.moe/v4/anime";
 
 // In-memory memo so repeated renders don't refetch the same title.
 const ART_TTL = 6 * 60 * 60 * 1000;
@@ -81,6 +82,20 @@ async function kitsuArt(search: string, signal?: AbortSignal): Promise<AnimeImag
   return { cover: attrs?.posterImage?.original ?? attrs?.posterImage?.large, banner: attrs?.coverImage?.original ?? attrs?.coverImage?.large };
 }
 
+async function jikanArt(search: string, signal?: AbortSignal): Promise<AnimeImageResult> {
+  const url = `${JIKAN}?q=${encodeURIComponent(search)}&limit=5&sfw=true`;
+  const response = await fetch(url, { cache: "force-cache", signal, headers: { accept: "application/json" } });
+  if (!response.ok) return {};
+  const json = await response.json() as { data?: Array<{ title?: string; title_english?: string; title_japanese?: string; titles?: Array<{ title?: string }>; images?: { webp?: { large_image_url?: string; image_url?: string }; jpg?: { large_image_url?: string; image_url?: string } } }> };
+  const match = json.data?.find((item) => [
+    item.title,
+    item.title_english,
+    item.title_japanese,
+    ...(item.titles ?? []).map((title) => title.title),
+  ].some((candidate) => likelySameTitle(search, candidate)));
+  return { cover: match?.images?.webp?.large_image_url ?? match?.images?.jpg?.large_image_url ?? match?.images?.webp?.image_url ?? match?.images?.jpg?.image_url };
+}
+
 export async function animeArtFallback(title?: string): Promise<AnimeImageResult> {
   const search = cleanMediaTitle(title);
   if (!search) return {};
@@ -96,6 +111,10 @@ export async function animeArtFallback(title?: string): Promise<AnimeImageResult
     if (!result.cover) {
       const second = await kitsuArt(search, controller.signal).catch((): AnimeImageResult => ({}));
       result = { cover: result.cover ?? second.cover, banner: result.banner ?? second.banner };
+    }
+    if (!result.cover) {
+      const third = await jikanArt(search, controller.signal).catch((): AnimeImageResult => ({}));
+      result = { cover: result.cover ?? third.cover, banner: result.banner ?? third.banner };
     }
     artCache.set(key, { value: result, at: Date.now() });
     return result;
