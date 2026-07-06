@@ -14,13 +14,14 @@ function joinBase(base: string, path = "") {
 export async function SourceHome({ source }: { source: CatalogSourceId }) {
   const data = await sourceHome(source);
   const [latestCards, ongoingCards, recCards, movieCards] = await Promise.all([
-    enrichMissingPosters(data.latest.slice(0, 12), 8, 3),
-    enrichMissingPosters(data.ongoing.slice(0, 12), 8, 2),
-    enrichMissingPosters(data.popular.slice(0, 12), 8, 4),
-    enrichMissingPosters(data.movies.slice(0, 12), 10, 4),
+    enrichMissingPosters(data.latest.slice(0, 12), 12, 12),
+    enrichMissingPosters(data.ongoing.slice(0, 12), 12, 12),
+    enrichMissingPosters(data.popular.slice(0, 12), 12, 12),
+    enrichMissingPosters(data.movies.slice(0, 12), 12, 12),
   ]);
   const base = source === "all" ? "/" : `/s/${source}`;
-  const slides = [...recCards, ...latestCards, ...movieCards].filter(Boolean).slice(0, 10) as DisplayCard[];
+  const heroPool = [...recCards, ...movieCards, ...latestCards].filter(Boolean) as DisplayCard[];
+  const slides = [...heroPool.filter((card) => card.banner), ...heroPool.filter((card) => !card.banner)].slice(0, 10);
 
   return <main className="idlix-home min-h-screen overflow-hidden bg-[#030711] pb-[calc(7rem+env(safe-area-inset-bottom))] lg:pb-16">
     <HomeHeroSlider slides={slides} base={base} />
